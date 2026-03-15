@@ -43,4 +43,45 @@
  */
 export function calculateEMI(principal, monthlyRate, emi) {
   // Your code here
+  if (
+    typeof principal !== "number" ||
+    typeof monthlyRate !== "number" ||
+    typeof emi !== "number" ||
+    Number.isNaN(principal) ||
+    principal <= 0 ||
+    Number.isNaN(monthlyRate) ||
+    monthlyRate < 0 ||
+    Number.isNaN(emi) ||
+    emi <= 0
+  ) {
+    return { months: -1, totalPaid: -1, totalInterest: -1 };
+  }
+
+  if (monthlyRate > 0 && emi <= principal * monthlyRate) {
+    return { months: -1, totalPaid: -1, totalInterest: -1 };
+  }
+  let remaining = principal;
+  let months = 0;
+  let totalPaid = 0;
+
+  while (remaining > 0.000001) {
+    let interest = remaining * monthlyRate;
+    remaining += interest;
+
+    if (remaining < emi) {
+      totalPaid += remaining;
+      remaining = 0;
+    } else {
+      remaining -= emi;
+      totalPaid += emi;
+    }
+    months++;
+  }
+  let totalInterest = totalPaid - principal;
+
+  return {
+    months,
+    totalPaid: Math.round(totalPaid * 100) / 100,
+    totalInterest: Math.round(totalInterest * 100) / 100,
+  };
 }
